@@ -1,0 +1,116 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Jost', ui-sans-serif, system-ui, sans-serif;
+
+  --color-ivory-50: #fdfbf7;
+  --color-ivory-100: #f9f5ec;
+  --color-ivory-200: #f1eadb;
+  --color-ivory-300: #e6dcc6;
+
+  --color-forest-50: #eef4f1;
+  --color-forest-100: #d5e5dd;
+  --color-forest-200: #a9c9b9;
+  --color-forest-600: #2b6352;
+  --color-forest-700: #1f4b3e;
+  --color-forest-800: #173a30;
+  --color-forest-900: #102b24;
+  --color-forest-950: #0a1d18;
+
+  --color-gold-100: #f6eedc;
+  --color-gold-200: #ebdab2;
+  --color-gold-300: #ddc186;
+  --color-gold-400: #cda660;
+  --color-gold-500: #b88d45;
+  --color-gold-600: #9b7336;
+  --color-gold-700: #7a5a2b;
+
+  --animate-fade-up: fade-up 0.8s ease-out both;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-ivory-50 font-sans text-stone-700 antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display text-forest-900;
+  }
+
+  ::selection {
+    @apply bg-gold-200 text-forest-900;
+  }
+}
+
+@utility btn {
+  @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-sm px-6 py-3 text-sm font-medium tracking-wider uppercase transition duration-300 focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .eyebrow {
+    @apply text-xs font-medium tracking-[0.3em] text-gold-600 uppercase;
+  }
+
+  .btn-primary {
+    @apply btn bg-forest-800 text-ivory-50 hover:bg-forest-900;
+  }
+
+  .btn-gold {
+    @apply btn bg-gold-500 text-white hover:bg-gold-600;
+  }
+
+  .btn-outline {
+    @apply btn border border-forest-800 text-forest-800 hover:bg-forest-800 hover:text-ivory-50;
+  }
+
+  .btn-outline-light {
+    @apply btn border border-white/70 text-white hover:bg-white hover:text-forest-900;
+  }
+
+  .form-label {
+    @apply mb-1.5 block text-xs font-medium tracking-wider text-stone-500 uppercase;
+  }
+
+  .form-control {
+    @apply w-full rounded-sm border border-ivory-300 bg-white px-4 py-3 text-sm text-stone-800 transition placeholder:text-stone-400 focus:border-gold-500 focus:ring-1 focus:ring-gold-400 focus:outline-none;
+  }
+
+  .form-control.ng-invalid.ng-touched {
+    @apply border-red-400 focus:border-red-400 focus:ring-red-300;
+  }
+
+  .form-error {
+    @apply mt-1 text-xs text-red-600;
+  }
+
+  .card {
+    @apply rounded-sm border border-ivory-200 bg-white shadow-[0_1px_2px_rgba(16,43,36,0.04),0_8px_24px_-12px_rgba(16,43,36,0.12)];
+  }
+
+  .gold-rule {
+    @apply h-px w-16 bg-linear-to-r from-gold-500 to-gold-300;
+  }
+}

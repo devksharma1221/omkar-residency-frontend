@@ -1,0 +1,269 @@
+@if (room(); as room) {
+  <section class="pt-28 pb-16 sm:pt-32">
+    <div class="container-page">
+      <nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-2 text-xs tracking-wider text-stone-500 uppercase">
+        <a routerLink="/" class="hover:text-gold-600">Home</a>
+        <app-icon name="chevron-right" class="size-3" />
+        <a routerLink="/rooms" class="hover:text-gold-600">Rooms</a>
+        <app-icon name="chevron-right" class="size-3" />
+        <span class="text-gold-600">{{ room.name }}</span>
+      </nav>
+
+      <div class="mt-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <p class="eyebrow">{{ room.category }} Collection</p>
+          <h1 class="mt-2 text-5xl font-medium sm:text-6xl">{{ room.name }}</h1>
+          <p class="mt-3 text-lg text-stone-500">{{ room.tagline }}</p>
+        </div>
+        <div class="flex items-center gap-2 text-sm">
+          <app-icon name="star" [filled]="true" class="size-5 text-gold-500" />
+          <span class="text-lg font-medium text-forest-900">{{ room.rating.toFixed(1) }}</span>
+          <span class="text-stone-500">· {{ room.reviewCount }} verified reviews</span>
+        </div>
+      </div>
+
+      <!-- Gallery -->
+      <div class="mt-10 grid gap-4 lg:grid-cols-[1fr_180px]">
+        <div class="group relative aspect-[16/10] overflow-hidden rounded-sm bg-ivory-200">
+          @for (image of room.images; track image; let i = $index) {
+            <img
+              [src]="image"
+              [alt]="room.name + ' photo ' + (i + 1)"
+              class="absolute inset-0 size-full object-cover transition-opacity duration-500"
+              [class]="i === activeImage() ? 'opacity-100' : 'opacity-0'"
+              [attr.loading]="i === 0 ? null : 'lazy'"
+            />
+          }
+          <button
+            type="button"
+            class="absolute top-1/2 left-4 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-forest-900 shadow transition hover:bg-white"
+            aria-label="Previous photo"
+            (click)="showImage(-1)"
+          >
+            <app-icon name="chevron-left" class="size-5" />
+          </button>
+          <button
+            type="button"
+            class="absolute top-1/2 right-4 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-forest-900 shadow transition hover:bg-white"
+            aria-label="Next photo"
+            (click)="showImage(1)"
+          >
+            <app-icon name="chevron-right" class="size-5" />
+          </button>
+          <span class="absolute right-4 bottom-4 rounded-sm bg-forest-950/70 px-3 py-1 text-xs text-white">
+            {{ activeImage() + 1 }} / {{ room.images.length }}
+          </span>
+        </div>
+        <div class="grid grid-cols-4 gap-3 lg:grid-cols-1 lg:content-start">
+          @for (image of room.images; track image; let i = $index) {
+            <button
+              type="button"
+              class="aspect-[4/3] overflow-hidden rounded-sm ring-offset-2 transition"
+              [class]="i === activeImage() ? 'ring-2 ring-gold-500' : 'opacity-70 hover:opacity-100'"
+              [attr.aria-label]="'Show photo ' + (i + 1)"
+              [attr.aria-current]="i === activeImage()"
+              (click)="activeImage.set(i)"
+            >
+              <img [src]="image" alt="" loading="lazy" class="size-full object-cover" />
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="mt-14 grid gap-12 lg:grid-cols-[1fr_380px]">
+        <!-- Details -->
+        <div>
+          <ul class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <li class="card p-4">
+              <app-icon name="maximize" class="size-5 text-gold-600" />
+              <p class="mt-2 text-xs text-stone-500">Room size</p>
+              <p class="font-medium text-forest-900">{{ room.sizeSqFt }} sq ft</p>
+            </li>
+            <li class="card p-4">
+              <app-icon name="users" class="size-5 text-gold-600" />
+              <p class="mt-2 text-xs text-stone-500">Occupancy</p>
+              <p class="font-medium text-forest-900">
+                {{ room.maxAdults }} adults
+                @if (room.maxChildren) {
+                  + {{ room.maxChildren }} {{ room.maxChildren === 1 ? 'child' : 'children' }}
+                }
+              </p>
+            </li>
+            <li class="card p-4">
+              <app-icon name="bed" class="size-5 text-gold-600" />
+              <p class="mt-2 text-xs text-stone-500">Bedding</p>
+              <p class="font-medium text-forest-900">{{ room.bed }}</p>
+            </li>
+            <li class="card p-4">
+              <app-icon name="eye" class="size-5 text-gold-600" />
+              <p class="mt-2 text-xs text-stone-500">View</p>
+              <p class="font-medium text-forest-900">{{ room.view }}</p>
+            </li>
+          </ul>
+
+          <h2 class="mt-12 text-3xl font-semibold">About this room</h2>
+          <div class="gold-rule mt-4"></div>
+          <p class="mt-6 leading-relaxed text-stone-600">{{ room.description }}</p>
+          <ul class="mt-6 space-y-3">
+            @for (highlight of room.highlights; track highlight) {
+              <li class="flex gap-3 text-stone-700">
+                <app-icon name="check-circle" class="mt-0.5 size-5 text-forest-600" />
+                {{ highlight }}
+              </li>
+            }
+          </ul>
+
+          <h2 class="mt-12 text-3xl font-semibold">Amenities</h2>
+          <div class="gold-rule mt-4"></div>
+          <ul class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            @for (amenity of amenities(); track amenity.label) {
+              <li class="flex items-center gap-3 text-sm text-stone-700">
+                <span class="grid size-10 place-items-center rounded-full bg-forest-50 text-forest-700">
+                  <app-icon [name]="amenity.icon" class="size-5" />
+                </span>
+                {{ amenity.label }}
+              </li>
+            }
+          </ul>
+
+          <h2 class="mt-12 text-3xl font-semibold">Room facilities</h2>
+          <div class="gold-rule mt-4"></div>
+          <ul class="mt-6 grid gap-x-8 gap-y-3 sm:grid-cols-2">
+            @for (facility of room.facilities; track facility) {
+              <li class="flex items-center gap-3 border-b border-ivory-200 pb-3 text-sm text-stone-700">
+                <app-icon name="check" class="size-4 text-gold-600" />
+                {{ facility }}
+              </li>
+            }
+          </ul>
+
+          <div class="mt-12 grid gap-4 rounded-sm bg-ivory-100 p-6 sm:grid-cols-3">
+            <div class="flex items-center gap-3 text-sm">
+              <app-icon name="clock" class="size-5 text-gold-600" />
+              <span>Check-in from <strong>{{ hotel.checkInTime }}</strong></span>
+            </div>
+            <div class="flex items-center gap-3 text-sm">
+              <app-icon name="clock" class="size-5 text-gold-600" />
+              <span>Check-out by <strong>{{ hotel.checkOutTime }}</strong></span>
+            </div>
+            <div class="flex items-center gap-3 text-sm">
+              <app-icon name="shield" class="size-5 text-gold-600" />
+              <span>Free cancellation up to 48h</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Booking card -->
+        <aside>
+          <form [formGroup]="stayForm" (ngSubmit)="reserve()" class="card p-6 lg:sticky lg:top-28" aria-label="Reserve this room">
+            <div class="flex items-end justify-between border-b border-ivory-200 pb-5">
+              <div>
+                @if (room.originalPrice) {
+                  <p class="text-sm text-stone-400 line-through">{{ room.originalPrice | inr }}</p>
+                }
+                <p class="font-display text-4xl font-semibold text-forest-900">
+                  {{ room.pricePerNight | inr }}<span class="font-sans text-sm font-normal text-stone-500"> / night</span>
+                </p>
+              </div>
+              <span class="text-xs text-stone-500">+ taxes</span>
+            </div>
+
+            <div class="mt-5 grid grid-cols-2 gap-3">
+              <div>
+                <label for="detail-check-in" class="form-label">Check-in</label>
+                <input
+                  id="detail-check-in"
+                  type="date"
+                  formControlName="checkIn"
+                  [min]="today"
+                  class="form-control px-3!"
+                  (change)="onCheckInChange()"
+                />
+              </div>
+              <div>
+                <label for="detail-check-out" class="form-label">Check-out</label>
+                <input
+                  id="detail-check-out"
+                  type="date"
+                  formControlName="checkOut"
+                  [min]="stayForm.controls.checkIn.value || today"
+                  class="form-control px-3!"
+                />
+              </div>
+            </div>
+            <div class="mt-3">
+              <label for="detail-guests" class="form-label">Guests</label>
+              <select id="detail-guests" formControlName="guests" class="form-control">
+                @for (n of guestOptions(); track n) {
+                  <option [ngValue]="n">{{ n }} {{ n === 1 ? 'Guest' : 'Guests' }}</option>
+                }
+              </select>
+            </div>
+
+            @if (stayForm.errors && stayForm.touched) {
+              <p class="form-error" role="alert">
+                {{
+                  stayForm.hasError('pastCheckIn')
+                    ? 'Check-in cannot be in the past.'
+                    : 'Check-out must be after check-in.'
+                }}
+              </p>
+            }
+
+            @if (estimate().nights > 0) {
+              <dl class="mt-5 space-y-2 border-t border-ivory-200 pt-5 text-sm">
+                <div class="flex justify-between">
+                  <dt class="text-stone-600">
+                    {{ room.pricePerNight | inr }} × {{ estimate().nights }}
+                    {{ estimate().nights === 1 ? 'night' : 'nights' }}
+                  </dt>
+                  <dd>{{ estimate().roomTotal | inr }}</dd>
+                </div>
+                <div class="flex justify-between">
+                  <dt class="text-stone-600">GST ({{ estimate().taxRate * 100 }}%)</dt>
+                  <dd>{{ estimate().taxes | inr }}</dd>
+                </div>
+                <div class="flex justify-between border-t border-ivory-200 pt-3 text-base font-medium text-forest-900">
+                  <dt>Total</dt>
+                  <dd>{{ estimate().grandTotal | inr }}</dd>
+                </div>
+              </dl>
+            }
+
+            <button type="submit" class="btn-gold mt-6 w-full">Reserve Now</button>
+            <p class="mt-3 text-center text-xs text-stone-500">No payment required today</p>
+          </form>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- Similar rooms -->
+  <section class="bg-ivory-100 py-20">
+    <div class="container-page">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p class="eyebrow">Explore more</p>
+          <h2 class="mt-2 text-4xl font-medium">You may also like</h2>
+        </div>
+        <a routerLink="/rooms" class="btn-outline">All rooms</a>
+      </div>
+      <div class="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        @for (similar of similarRooms(); track similar.id) {
+          <app-room-card [room]="similar" />
+        }
+      </div>
+    </div>
+  </section>
+} @else {
+  <section class="container-page flex min-h-[70vh] flex-col items-center justify-center pt-28 pb-16 text-center">
+    <span class="grid size-16 place-items-center rounded-full bg-ivory-100 text-gold-600">
+      <app-icon name="bed" class="size-7" />
+    </span>
+    <h1 class="mt-6 text-5xl">Room not found</h1>
+    <p class="mt-3 max-w-md text-stone-500">
+      The room you're looking for doesn't exist or may have been renamed. Explore our full collection instead.
+    </p>
+    <a routerLink="/rooms" class="btn-primary mt-8">View all rooms</a>
+  </section>
+}

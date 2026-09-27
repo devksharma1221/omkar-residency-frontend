@@ -1,0 +1,251 @@
+<!-- Hero -->
+<section class="relative isolate flex min-h-[100svh] items-center overflow-hidden pt-28 pb-40 sm:pb-48">
+  <img
+    [src]="heroImage"
+    alt="Omkar Residency illuminated at dusk with its pool in the foreground"
+    class="absolute inset-0 -z-20 size-full object-cover"
+    fetchpriority="high"
+  />
+  <div class="absolute inset-0 -z-10 bg-linear-to-b from-forest-950/70 via-forest-950/45 to-forest-950/80"></div>
+
+  <div class="container-page text-center text-white">
+    <p class="animate-fade-up text-xs font-medium tracking-[0.4em] text-gold-300 uppercase">
+      Welcome to Omkar Residency · Nashik
+    </p>
+    <h1
+      class="animate-fade-up mx-auto mt-6 max-w-4xl text-5xl leading-[1.05] font-medium text-white [animation-delay:150ms] sm:text-6xl lg:text-7xl"
+    >
+      A Timeless Stay, Rooted in <em class="text-gold-300">Indian Hospitality</em>
+    </h1>
+    <p class="animate-fade-up mx-auto mt-6 max-w-2xl text-lg text-ivory-100/90 [animation-delay:300ms]">
+      Elegant rooms, soulful cuisine and service that remembers your name — discover a boutique retreat crafted for
+      unhurried luxury.
+    </p>
+    <div class="animate-fade-up mt-10 flex flex-col justify-center gap-4 [animation-delay:450ms] sm:flex-row">
+      <a routerLink="/rooms" class="btn-gold">Explore Rooms <app-icon name="arrow-right" class="size-4" /></a>
+      <a routerLink="/booking" class="btn-outline-light">Book Your Stay</a>
+    </div>
+  </div>
+</section>
+
+<!-- Booking search -->
+<div class="relative z-10 -mt-28 sm:-mt-32">
+  <div class="container-page">
+    <app-booking-search />
+  </div>
+</div>
+
+<!-- Introduction -->
+<section class="py-24 sm:py-32">
+  <div class="container-page grid items-center gap-16 lg:grid-cols-2">
+    <div class="relative pb-12 sm:pr-16">
+      <img
+        [src]="introImages.primary"
+        alt="Resort pool framed by palms"
+        loading="lazy"
+        class="aspect-[4/5] w-full rounded-sm object-cover shadow-xl"
+      />
+      <img
+        [src]="introImages.secondary"
+        alt="Elegant dining setting"
+        loading="lazy"
+        class="absolute right-0 bottom-0 hidden aspect-square w-1/2 rounded-sm border-8 border-ivory-50 object-cover shadow-xl sm:block"
+      />
+      <div
+        class="absolute top-8 -left-3 hidden rounded-sm bg-forest-800 px-6 py-5 text-center text-white shadow-lg sm:block"
+      >
+        <p class="font-display text-4xl text-gold-300">15+</p>
+        <p class="text-[0.65rem] tracking-[0.25em] uppercase">Years of<br />Excellence</p>
+      </div>
+    </div>
+
+    <div>
+      <app-section-heading
+        align="left"
+        eyebrow="Our Story"
+        title="A Residence of Grace in the City of Pilgrims & Vineyards"
+        subtitle="Nestled on Gangapur Road, Omkar Residency blends the warmth of a family home with the polish of a luxury hotel. Our spaces are inspired by Maratha architecture, draped in handloom textiles and lit by brass diyas."
+      />
+      <p class="mt-5 leading-relaxed text-stone-600">
+        Whether you are here for the Trimbakeshwar darshan, a wine trail through Sula Valley or an important business
+        meeting, our team curates every moment so you can simply arrive and unwind.
+      </p>
+      <dl class="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-4">
+        @for (stat of stats; track stat.label) {
+          <div class="flex flex-col border-l-2 border-gold-400 pl-4">
+            <dt class="text-xs text-stone-500">{{ stat.label }}</dt>
+            <dd class="order-first font-display text-3xl font-semibold text-forest-900">{{ stat.value }}</dd>
+          </div>
+        }
+      </dl>
+      <a routerLink="/about" class="btn-outline mt-10">Discover More</a>
+    </div>
+  </div>
+</section>
+
+<!-- Featured rooms -->
+<section class="bg-ivory-100 py-24 sm:py-32">
+  <div class="container-page">
+    <app-section-heading
+      eyebrow="Rooms & Suites"
+      title="Curated Spaces for Restful Nights"
+      subtitle="Each room is a quiet sanctuary — thoughtfully appointed with artisanal details, premium bedding and modern comforts."
+    />
+    <div class="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      @for (room of featuredRooms; track room.id) {
+        <app-room-card [room]="room" />
+      }
+    </div>
+    <div class="mt-14 text-center">
+      <a routerLink="/rooms" class="btn-primary">View All Rooms <app-icon name="arrow-right" class="size-4" /></a>
+    </div>
+  </div>
+</section>
+
+<!-- Amenities -->
+<section class="relative overflow-hidden bg-forest-900 py-24 sm:py-32">
+  <div
+    class="pointer-events-none absolute -top-40 -right-40 size-[28rem] rounded-full border border-gold-500/20"
+    aria-hidden="true"
+  ></div>
+  <div
+    class="pointer-events-none absolute -bottom-52 -left-32 size-[32rem] rounded-full border border-gold-500/10"
+    aria-hidden="true"
+  ></div>
+  <div class="container-page relative">
+    <app-section-heading
+      [light]="true"
+      eyebrow="Amenities"
+      title="Everything You Need, Beautifully Considered"
+      subtitle="From sunrise yoga to midnight room service, our facilities are designed around your comfort."
+    />
+    <div class="mt-16 grid gap-px overflow-hidden rounded-sm bg-forest-700/60 sm:grid-cols-2 lg:grid-cols-4">
+      @for (amenity of amenities; track amenity.title) {
+        <div class="group bg-forest-900 p-8 transition duration-300 hover:bg-forest-800">
+          <span
+            class="grid size-14 place-items-center rounded-full border border-gold-500/40 text-gold-300 transition group-hover:bg-gold-500 group-hover:text-white"
+          >
+            <app-icon [name]="amenity.icon" class="size-6" />
+          </span>
+          <h3 class="mt-6 text-2xl text-white">{{ amenity.title }}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-forest-100/80">{{ amenity.description }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Experiences -->
+<section class="py-24 sm:py-32">
+  <div class="container-page">
+    <app-section-heading
+      eyebrow="Signature Experiences"
+      title="Moments Worth Savouring"
+      subtitle="Indulge in the experiences that make a stay at Omkar Residency truly memorable."
+    />
+    <div class="mt-16 grid gap-6 md:grid-cols-3">
+      @for (exp of experiences; track exp.title) {
+        <article class="group relative isolate aspect-[3/4] overflow-hidden rounded-sm">
+          <img
+            [src]="exp.image"
+            [alt]="exp.title"
+            loading="lazy"
+            class="absolute inset-0 -z-20 size-full object-cover transition duration-700 group-hover:scale-105"
+          />
+          <div class="absolute inset-0 -z-10 bg-linear-to-t from-forest-950/90 via-forest-950/20 to-transparent"></div>
+          <div class="flex h-full flex-col justify-end p-8">
+            <div class="gold-rule mb-4"></div>
+            <h3 class="text-3xl text-white">{{ exp.title }}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-ivory-100/85">{{ exp.text }}</p>
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="bg-ivory-100 py-24 sm:py-32">
+  <div class="container-page">
+    <app-section-heading eyebrow="Guest Stories" title="Words From Our Guests" />
+
+    <div class="relative mx-auto mt-14 max-w-4xl">
+      <span
+        class="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 font-display text-[10rem] leading-none text-gold-300/40 select-none"
+        aria-hidden="true"
+        >&ldquo;</span
+      >
+      <div class="grid" aria-live="polite">
+        @for (t of testimonials; track t.name; let i = $index) {
+          <figure
+            class="col-start-1 row-start-1 text-center transition-all duration-700"
+            [class]="
+              i === activeTestimonial() ? 'visible translate-y-0 opacity-100' : 'invisible translate-y-4 opacity-0'
+            "
+            [attr.aria-hidden]="i !== activeTestimonial()"
+          >
+            <div class="flex justify-center gap-1 text-gold-500" [attr.aria-label]="t.rating + ' out of 5 stars'">
+              @for (s of [1, 2, 3, 4, 5]; track s) {
+                <app-icon name="star" [filled]="s <= t.rating" class="size-5" />
+              }
+            </div>
+            <blockquote class="mt-6 font-display text-2xl leading-relaxed text-forest-900 italic sm:text-3xl">
+              {{ t.quote }}
+            </blockquote>
+            <figcaption class="mt-8">
+              <p class="font-medium text-forest-900">{{ t.name }}, {{ t.location }}</p>
+              <p class="mt-1 text-xs tracking-wider text-gold-600 uppercase">{{ t.stay }}</p>
+            </figcaption>
+          </figure>
+        }
+      </div>
+
+      <div class="mt-10 flex items-center justify-center gap-6">
+        <button
+          type="button"
+          class="grid size-11 place-items-center rounded-full border border-forest-800/30 text-forest-800 transition hover:bg-forest-800 hover:text-white"
+          aria-label="Previous testimonial"
+          (click)="previousTestimonial()"
+        >
+          <app-icon name="chevron-left" class="size-5" />
+        </button>
+        <div class="flex gap-2">
+          @for (t of testimonials; track t.name; let i = $index) {
+            <button
+              type="button"
+              class="h-2 rounded-full transition-all duration-300"
+              [class]="i === activeTestimonial() ? 'w-8 bg-gold-500' : 'w-2 bg-forest-800/25'"
+              [attr.aria-label]="'Show testimonial ' + (i + 1)"
+              [attr.aria-current]="i === activeTestimonial()"
+              (click)="activeTestimonial.set(i)"
+            ></button>
+          }
+        </div>
+        <button
+          type="button"
+          class="grid size-11 place-items-center rounded-full border border-forest-800/30 text-forest-800 transition hover:bg-forest-800 hover:text-white"
+          aria-label="Next testimonial"
+          (click)="nextTestimonial()"
+        >
+          <app-icon name="chevron-right" class="size-5" />
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="relative isolate overflow-hidden py-24 sm:py-28">
+  <img [src]="experiences[2].image" alt="" loading="lazy" class="absolute inset-0 -z-20 size-full object-cover" />
+  <div class="absolute inset-0 -z-10 bg-forest-950/75"></div>
+  <div class="container-page text-center">
+    <p class="eyebrow text-gold-300">Exclusive Direct Booking Offer</p>
+    <h2 class="mx-auto mt-4 max-w-3xl text-4xl text-white sm:text-5xl">
+      Book directly and enjoy up to 15% off with complimentary breakfast
+    </h2>
+    <div class="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
+      <a routerLink="/booking" class="btn-gold">Reserve Now</a>
+      <a routerLink="/contact" class="btn-outline-light">Speak to Concierge</a>
+    </div>
+  </div>
+</section>

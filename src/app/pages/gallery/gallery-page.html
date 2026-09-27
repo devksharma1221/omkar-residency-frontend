@@ -1,0 +1,97 @@
+<app-page-header
+  title="Gallery"
+  subtitle="A glimpse into the spaces, flavours and moments that define Omkar Residency."
+  [image]="headerImage"
+/>
+
+<section class="py-16 sm:py-20">
+  <div class="container-page">
+    <div class="flex flex-wrap justify-center gap-2" role="tablist" aria-label="Filter gallery">
+      @for (filter of filters; track filter) {
+        <button
+          type="button"
+          role="tab"
+          class="rounded-full border px-5 py-2 text-sm tracking-wider transition"
+          [class]="
+            activeFilter() === filter
+              ? 'border-forest-800 bg-forest-800 text-white'
+              : 'border-ivory-300 text-stone-600 hover:border-forest-800 hover:text-forest-900'
+          "
+          [attr.aria-selected]="activeFilter() === filter"
+          (click)="setFilter(filter)"
+        >
+          {{ filter }}
+        </button>
+      }
+    </div>
+
+    <div class="mt-12 columns-1 gap-5 sm:columns-2 lg:columns-3">
+      @for (image of images(); track image.src; let i = $index) {
+        <button
+          type="button"
+          class="group relative mb-5 block w-full break-inside-avoid overflow-hidden rounded-sm focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:outline-none"
+          [attr.aria-label]="'Open photo: ' + image.alt"
+          (click)="open(i)"
+        >
+          <img
+            [src]="image.src"
+            [alt]="image.alt"
+            loading="lazy"
+            class="w-full object-cover transition duration-700 group-hover:scale-105"
+            [class]="image.tall ? 'aspect-[3/4]' : 'aspect-[4/3]'"
+          />
+          <span
+            class="absolute inset-0 flex items-end bg-linear-to-t from-forest-950/80 via-transparent to-transparent p-5 text-left opacity-0 transition duration-500 group-hover:opacity-100 group-focus-visible:opacity-100"
+          >
+            <span>
+              <span class="block text-[0.65rem] tracking-[0.25em] text-gold-300 uppercase">{{ image.category }}</span>
+              <span class="mt-1 block font-display text-xl text-white">{{ image.alt }}</span>
+            </span>
+          </span>
+        </button>
+      }
+    </div>
+  </div>
+</section>
+
+@if (lightboxImage(); as image) {
+  <div
+    class="fixed inset-0 z-[70] flex items-center justify-center bg-forest-950/95 p-4 backdrop-blur-sm"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="image.alt"
+    (click)="close()"
+  >
+    <button
+      type="button"
+      class="absolute top-4 right-4 grid size-12 place-items-center rounded-full text-white transition hover:bg-white/10"
+      aria-label="Close"
+      (click)="close()"
+    >
+      <app-icon name="x" class="size-7" />
+    </button>
+    <button
+      type="button"
+      class="absolute left-2 grid size-12 place-items-center rounded-full text-white transition hover:bg-white/10 sm:left-6"
+      aria-label="Previous photo"
+      (click)="$event.stopPropagation(); step(-1)"
+    >
+      <app-icon name="chevron-left" class="size-8" />
+    </button>
+    <figure class="max-h-full max-w-5xl" (click)="$event.stopPropagation()">
+      <img [src]="image.src" [alt]="image.alt" class="max-h-[80vh] w-auto rounded-sm object-contain shadow-2xl" />
+      <figcaption class="mt-4 text-center text-sm text-ivory-100">
+        {{ image.alt }}
+        <span class="ml-2 text-gold-300">{{ (lightboxIndex() ?? 0) + 1 }} / {{ images().length }}</span>
+      </figcaption>
+    </figure>
+    <button
+      type="button"
+      class="absolute right-2 grid size-12 place-items-center rounded-full text-white transition hover:bg-white/10 sm:right-6"
+      aria-label="Next photo"
+      (click)="$event.stopPropagation(); step(1)"
+    >
+      <app-icon name="chevron-right" class="size-8" />
+    </button>
+  </div>
+}

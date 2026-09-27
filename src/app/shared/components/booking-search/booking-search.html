@@ -1,0 +1,58 @@
+<form
+  [formGroup]="form"
+  (ngSubmit)="search()"
+  class="card grid gap-4 p-5 sm:grid-cols-2 sm:p-6 lg:grid-cols-[1fr_1fr_0.7fr_0.7fr_auto] lg:items-end"
+  aria-label="Check availability"
+>
+  <div>
+    <label for="search-check-in" class="form-label">Check-in</label>
+    <input
+      id="search-check-in"
+      type="date"
+      formControlName="checkIn"
+      [min]="today"
+      class="form-control"
+      (change)="onCheckInChange()"
+    />
+  </div>
+  <div>
+    <label for="search-check-out" class="form-label">Check-out</label>
+    <input
+      id="search-check-out"
+      type="date"
+      formControlName="checkOut"
+      [min]="form.controls.checkIn.value || today"
+      class="form-control"
+    />
+  </div>
+  <div>
+    <label for="search-adults" class="form-label">Adults</label>
+    <select id="search-adults" formControlName="adults" class="form-control">
+      @for (n of adultOptions; track n) {
+        <option [ngValue]="n">{{ n }} {{ n === 1 ? 'Adult' : 'Adults' }}</option>
+      }
+    </select>
+  </div>
+  <div>
+    <label for="search-children" class="form-label">Children</label>
+    <select id="search-children" formControlName="children" class="form-control">
+      @for (n of childOptions; track n) {
+        <option [ngValue]="n">{{ n }} {{ n === 1 ? 'Child' : 'Children' }}</option>
+      }
+    </select>
+  </div>
+  <button type="submit" class="btn-primary h-[46px] sm:col-span-2 lg:col-span-1">
+    <app-icon name="calendar" class="size-4" />
+    Check Availability
+  </button>
+
+  @if (form.touched && form.errors) {
+    <p class="form-error sm:col-span-2 lg:col-span-5" role="alert">
+      @if (form.hasError('pastCheckIn')) {
+        Check-in date cannot be in the past.
+      } @else {
+        Check-out must be at least one night after check-in.
+      }
+    </p>
+  }
+</form>

@@ -1,0 +1,85 @@
+<footer class="relative bg-forest-950 text-forest-100">
+  <div class="h-1 bg-linear-to-r from-gold-600 via-gold-300 to-gold-600"></div>
+
+  <div class="container-page grid gap-12 py-16 sm:grid-cols-2 lg:grid-cols-12">
+    <div class="lg:col-span-4">
+      <a routerLink="/" aria-label="Omkar Residency home"><app-logo [light]="true" /></a>
+      <p class="mt-6 max-w-sm text-sm leading-relaxed text-forest-200">
+        {{ hotel.tagline }}. A sanctuary of calm in the heart of Nashik, crafted for travellers who value warmth,
+        detail and quiet luxury.
+      </p>
+      <div class="mt-6 flex gap-3">
+        @for (social of socials; track social.label) {
+          <a
+            [href]="social.href"
+            target="_blank"
+            rel="noopener"
+            [attr.aria-label]="social.label"
+            class="grid size-10 place-items-center rounded-full border border-forest-700 text-forest-100 transition hover:border-gold-400 hover:text-gold-300"
+          >
+            <app-icon [name]="social.icon" class="size-4" />
+          </a>
+        }
+      </div>
+    </div>
+
+    <div class="lg:col-span-2">
+      <h3 class="font-sans text-xs font-medium tracking-[0.3em] text-gold-300 uppercase">Explore</h3>
+      <ul class="mt-5 space-y-3 text-sm">
+        @for (item of explore; track item.path) {
+          <li>
+            <a [routerLink]="item.path" class="transition hover:text-gold-300">{{ item.label }}</a>
+          </li>
+        }
+      </ul>
+    </div>
+
+    <div class="lg:col-span-3">
+      <h3 class="font-sans text-xs font-medium tracking-[0.3em] text-gold-300 uppercase">Stay With Us</h3>
+      <ul class="mt-5 space-y-3 text-sm">
+        @for (room of rooms; track room.slug) {
+          <li>
+            <a [routerLink]="['/rooms', room.slug]" class="transition hover:text-gold-300">{{ room.label }}</a>
+          </li>
+        }
+      </ul>
+    </div>
+
+    <div class="lg:col-span-3">
+      <h3 class="font-sans text-xs font-medium tracking-[0.3em] text-gold-300 uppercase">Contact</h3>
+      <ul class="mt-5 space-y-4 text-sm">
+        <li class="flex gap-3">
+          <app-icon name="map-pin" class="mt-0.5 size-4 text-gold-400" />
+          <address class="leading-relaxed not-italic">
+            @for (line of hotel.address; track line) {
+              {{ line }}<br />
+            }
+          </address>
+        </li>
+        <li>
+          <a [href]="hotel.phoneHref" class="flex items-center gap-3 transition hover:text-gold-300">
+            <app-icon name="phone" class="size-4 text-gold-400" /> {{ hotel.phone }}
+          </a>
+        </li>
+        <li>
+          <a [href]="'mailto:' + hotel.email" class="flex items-center gap-3 break-all transition hover:text-gold-300">
+            <app-icon name="mail" class="size-4 text-gold-400" /> {{ hotel.email }}
+          </a>
+        </li>
+        <li class="flex items-center gap-3">
+          <app-icon name="clock" class="size-4 text-gold-400" />
+          Check-in {{ hotel.checkInTime }} · Check-out {{ hotel.checkOutTime }}
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="border-t border-forest-800">
+    <div
+      class="container-page flex flex-col items-center justify-between gap-3 py-6 text-xs text-forest-200 sm:flex-row"
+    >
+      <p>&copy; {{ year }} Omkar Residency. All rights reserved.</p>
+      <p class="tracking-wider">Crafted with warmth · Atithi Devo Bhava</p>
+    </div>
+  </div>
+</footer>

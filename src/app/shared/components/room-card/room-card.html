@@ -1,0 +1,72 @@
+@let r = room();
+<article class="card group flex h-full flex-col overflow-hidden transition duration-500 hover:-translate-y-1 hover:shadow-xl">
+  <a
+    [routerLink]="['/rooms', r.slug]"
+    [queryParams]="stayParams()"
+    class="relative block aspect-[4/3] overflow-hidden"
+    [attr.aria-label]="'View ' + r.name"
+  >
+    <img
+      [src]="r.images[0]"
+      [alt]="r.name"
+      loading="lazy"
+      class="size-full object-cover transition duration-700 group-hover:scale-105"
+    />
+    <span
+      class="absolute top-4 left-4 rounded-sm bg-ivory-50/95 px-3 py-1 text-[0.65rem] font-medium tracking-[0.2em] text-forest-800 uppercase"
+      >{{ r.category }}</span
+    >
+    @if (discount() > 0) {
+      <span class="absolute top-4 right-4 rounded-sm bg-gold-500 px-3 py-1 text-xs font-medium text-white"
+        >Save {{ discount() }}%</span
+      >
+    }
+  </a>
+
+  <div class="flex flex-1 flex-col p-6">
+    <div class="flex items-center gap-1.5 text-sm text-stone-500">
+      <app-icon name="star" [filled]="true" class="size-4 text-gold-400" />
+      <span class="font-medium text-forest-900">{{ r.rating.toFixed(1) }}</span>
+      <span>({{ r.reviewCount }} reviews)</span>
+    </div>
+
+    <h3 class="mt-2 text-2xl font-semibold">
+      <a [routerLink]="['/rooms', r.slug]" [queryParams]="stayParams()" class="transition hover:text-gold-600">{{
+        r.name
+      }}</a>
+    </h3>
+    <p class="mt-1 text-sm text-stone-500">{{ r.tagline }}</p>
+
+    <ul class="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-stone-600">
+      <li class="flex items-center gap-1.5"><app-icon name="maximize" class="size-4 text-gold-600" /> {{ r.sizeSqFt }} sq ft</li>
+      <li class="flex items-center gap-1.5">
+        <app-icon name="users" class="size-4 text-gold-600" /> Up to {{ r.maxAdults + r.maxChildren }} guests
+      </li>
+      <li class="flex items-center gap-1.5"><app-icon name="bed" class="size-4 text-gold-600" /> {{ r.bed }}</li>
+    </ul>
+
+    <ul class="mt-4 flex gap-2" aria-label="Key amenities">
+      @for (amenity of topAmenities(); track amenity.label) {
+        <li
+          class="grid size-9 place-items-center rounded-full bg-forest-50 text-forest-700"
+          [title]="amenity.label"
+        >
+          <app-icon [name]="amenity.icon" class="size-4" />
+          <span class="sr-only">{{ amenity.label }}</span>
+        </li>
+      }
+    </ul>
+
+    <div class="mt-auto flex items-end justify-between gap-4 border-t border-ivory-200 pt-5">
+      <div>
+        @if (r.originalPrice) {
+          <p class="text-xs text-stone-400 line-through">{{ r.originalPrice | inr }}</p>
+        }
+        <p class="font-display text-3xl font-semibold text-forest-900">
+          {{ r.pricePerNight | inr }}<span class="font-sans text-xs font-normal text-stone-500"> / night</span>
+        </p>
+      </div>
+      <a [routerLink]="['/booking']" [queryParams]="bookingParams()" class="btn-primary px-4! py-2.5! text-xs!">Book Now</a>
+    </div>
+  </div>
+</article>

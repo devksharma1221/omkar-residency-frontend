@@ -1,0 +1,111 @@
+<app-page-header
+  title="Contact Us"
+  subtitle="Our team is here to help plan your stay, celebration or event — we'd love to hear from you."
+  [image]="headerImage"
+/>
+
+<section class="py-16 sm:py-20">
+  <div class="container-page">
+    <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      @for (card of contactCards; track card.title) {
+        <li class="card p-6">
+          <span class="grid size-12 place-items-center rounded-full bg-forest-50 text-forest-700">
+            <app-icon [name]="card.icon" class="size-5" />
+          </span>
+          <h2 class="mt-5 text-2xl font-semibold">{{ card.title }}</h2>
+          <div class="mt-2 space-y-1 text-sm text-stone-600">
+            @for (line of card.lines; track line; let first = $first) {
+              @if (first && card.href) {
+                <a [href]="card.href" class="block break-all text-forest-800 hover:text-gold-600">{{ line }}</a>
+              } @else {
+                <p>{{ line }}</p>
+              }
+            }
+          </div>
+        </li>
+      }
+    </ul>
+
+    <div class="mt-16 grid gap-10 lg:grid-cols-5">
+      <div class="card p-6 sm:p-10 lg:col-span-3">
+        <p class="eyebrow">Send a message</p>
+        <h2 class="mt-2 text-4xl font-medium">How can we help?</h2>
+        <div class="gold-rule mt-4"></div>
+
+        @if (sentTo(); as name) {
+          <div class="mt-8 flex gap-4 rounded-sm border border-forest-200 bg-forest-50 p-5" role="status">
+            <app-icon name="check-circle" class="size-6 text-forest-600" />
+            <div>
+              <p class="font-medium text-forest-900">Thank you, {{ name }}!</p>
+              <p class="mt-1 text-sm text-stone-600">
+                Your message has been received. Our guest relations team will respond within 24 hours.
+              </p>
+              <button type="button" class="mt-3 text-xs font-medium tracking-wider text-gold-700 uppercase hover:underline" (click)="sentTo.set(null)">
+                Send another message
+              </button>
+            </div>
+          </div>
+        } @else {
+          <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="mt-8 grid gap-5 sm:grid-cols-2">
+            <div>
+              <label for="contact-name" class="form-label">Full name</label>
+              <input id="contact-name" type="text" formControlName="name" autocomplete="name" class="form-control" />
+              @if (showError('name')) {
+                <p class="form-error">Please enter your name.</p>
+              }
+            </div>
+            <div>
+              <label for="contact-email" class="form-label">Email</label>
+              <input id="contact-email" type="email" formControlName="email" autocomplete="email" class="form-control" />
+              @if (showError('email')) {
+                <p class="form-error">Please enter a valid email address.</p>
+              }
+            </div>
+            <div>
+              <label for="contact-phone" class="form-label">Phone <span class="normal-case">(optional)</span></label>
+              <input id="contact-phone" type="tel" formControlName="phone" autocomplete="tel" class="form-control" placeholder="+91" />
+              @if (showError('phone')) {
+                <p class="form-error">Please enter a valid 10-digit Indian mobile number.</p>
+              }
+            </div>
+            <div>
+              <label for="contact-subject" class="form-label">Subject</label>
+              <select id="contact-subject" formControlName="subject" class="form-control">
+                @for (subject of subjects; track subject) {
+                  <option [value]="subject">{{ subject }}</option>
+                }
+              </select>
+            </div>
+            <div class="sm:col-span-2">
+              <label for="contact-message" class="form-label">Message</label>
+              <textarea id="contact-message" rows="5" formControlName="message" class="form-control resize-none"></textarea>
+              @if (showError('message')) {
+                <p class="form-error">Please enter a message of at least 10 characters.</p>
+              }
+            </div>
+            <div class="sm:col-span-2">
+              <button type="submit" class="btn-primary w-full sm:w-auto" [disabled]="sending()">
+                @if (sending()) {
+                  <span class="size-4 animate-spin rounded-full border-2 border-white/40 border-t-white"></span>
+                  Sending…
+                } @else {
+                  <app-icon name="send" class="size-4" /> Send Message
+                }
+              </button>
+            </div>
+          </form>
+        }
+      </div>
+
+      <div class="min-h-[22rem] overflow-hidden rounded-sm border border-ivory-200 shadow-sm lg:col-span-2">
+        <iframe
+          [src]="mapUrl"
+          title="Map showing the location of Omkar Residency"
+          class="size-full min-h-[22rem] border-0 grayscale-[30%]"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+        ></iframe>
+      </div>
+    </div>
+  </div>
+</section>

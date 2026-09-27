@@ -1,0 +1,81 @@
+<header
+  class="fixed inset-x-0 top-0 z-50 transition-all duration-500"
+  [class]="
+    transparent()
+      ? 'bg-transparent py-5'
+      : 'border-b border-ivory-200 bg-ivory-50/95 py-3 shadow-sm backdrop-blur-md'
+  "
+>
+  <nav class="container-page flex items-center justify-between" aria-label="Main navigation">
+    <a routerLink="/" aria-label="Omkar Residency home">
+      <app-logo [light]="transparent()" />
+    </a>
+
+    <ul class="hidden items-center gap-8 lg:flex">
+      @for (link of links; track link.path) {
+        <li>
+          <a
+            [routerLink]="link.path"
+            routerLinkActive="text-gold-500! after:w-full!"
+            [routerLinkActiveOptions]="{ exact: link.path === '/' }"
+            class="relative py-1 text-sm tracking-wider uppercase transition-colors after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-gold-500 after:transition-all after:duration-300 hover:after:w-full"
+            [class]="transparent() ? 'text-white/90 hover:text-white' : 'text-forest-900 hover:text-gold-600'"
+            >{{ link.label }}</a
+          >
+        </li>
+      }
+    </ul>
+
+    <div class="flex items-center gap-3">
+      <a
+        [href]="hotel.phoneHref"
+        class="hidden items-center gap-2 text-sm xl:flex"
+        [class]="transparent() ? 'text-white/90' : 'text-forest-800'"
+      >
+        <app-icon name="phone" class="size-4" />
+        {{ hotel.phone }}
+      </a>
+      <a routerLink="/booking" class="btn-gold hidden px-5! py-2.5! sm:inline-flex">Book Now</a>
+      <button
+        type="button"
+        class="grid size-10 place-items-center rounded-sm lg:hidden"
+        [class]="transparent() ? 'text-white' : 'text-forest-900'"
+        [attr.aria-expanded]="menuOpen()"
+        aria-controls="mobile-menu"
+        [attr.aria-label]="menuOpen() ? 'Close menu' : 'Open menu'"
+        (click)="toggleMenu()"
+      >
+        <app-icon [name]="menuOpen() ? 'x' : 'menu'" class="size-6" />
+      </button>
+    </div>
+  </nav>
+
+  <div
+    id="mobile-menu"
+    class="grid transition-[grid-template-rows] duration-300 lg:hidden"
+    [class]="menuOpen() ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'"
+  >
+    <div class="overflow-hidden">
+      <ul class="container-page flex flex-col gap-1 pt-4 pb-6">
+        @for (link of links; track link.path) {
+          <li>
+            <a
+              [routerLink]="link.path"
+              routerLinkActive="text-gold-600! bg-ivory-100"
+              [routerLinkActiveOptions]="{ exact: link.path === '/' }"
+              class="block rounded-sm px-3 py-3 font-display text-xl text-forest-900 hover:bg-ivory-100"
+              [attr.tabindex]="menuOpen() ? null : -1"
+              >{{ link.label }}</a
+            >
+          </li>
+        }
+        <li class="mt-3 flex flex-col gap-3 border-t border-ivory-200 pt-4">
+          <a [href]="hotel.phoneHref" class="flex items-center gap-2 px-3 text-sm text-forest-800" [attr.tabindex]="menuOpen() ? null : -1">
+            <app-icon name="phone" class="size-4" /> {{ hotel.phone }}
+          </a>
+          <a routerLink="/booking" class="btn-gold w-full" [attr.tabindex]="menuOpen() ? null : -1">Book Your Stay</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</header>

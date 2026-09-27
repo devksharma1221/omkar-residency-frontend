@@ -1,0 +1,375 @@
+<app-page-header
+  title="Book Your Stay"
+  subtitle="Reserve directly with us for the best available rates and exclusive privileges."
+  [image]="headerImage"
+/>
+
+<section class="py-16 sm:py-20">
+  <div class="container-page">
+    @if (confirmation(); as booking) {
+      <!-- Confirmation -->
+      <div class="card mx-auto max-w-3xl overflow-hidden">
+        <div class="bg-forest-900 px-8 py-10 text-center text-white">
+          <span class="mx-auto grid size-16 place-items-center rounded-full bg-gold-500 text-white">
+            <app-icon name="check" class="size-8" [strokeWidth]="2" />
+          </span>
+          <h2 class="mt-6 text-4xl text-white">Your stay is reserved</h2>
+          <p class="mt-2 text-forest-100">
+            Thank you, {{ booking.request.guest.firstName }}. A confirmation has been sent to
+            {{ booking.request.guest.email }}.
+          </p>
+          <p class="mt-6 inline-block rounded-sm border border-gold-400/50 px-5 py-2 text-sm tracking-[0.2em] text-gold-300 uppercase">
+            Booking ref · {{ booking.reference }}
+          </p>
+        </div>
+        <dl class="grid gap-6 p-8 sm:grid-cols-2">
+          <div>
+            <dt class="form-label">Room</dt>
+            <dd class="font-display text-2xl text-forest-900">{{ selectedRoom()?.name }}</dd>
+          </div>
+          <div>
+            <dt class="form-label">Guests</dt>
+            <dd class="text-forest-900">
+              {{ booking.request.adults }} adult(s), {{ booking.request.children }} child(ren)
+            </dd>
+          </div>
+          <div>
+            <dt class="form-label">Check-in</dt>
+            <dd class="text-forest-900">{{ booking.request.checkIn | date: 'EEEE, d MMMM y' }}</dd>
+          </div>
+          <div>
+            <dt class="form-label">Check-out</dt>
+            <dd class="text-forest-900">{{ booking.request.checkOut | date: 'EEEE, d MMMM y' }}</dd>
+          </div>
+          <div class="border-t border-ivory-200 pt-6 sm:col-span-2">
+            <dt class="form-label">Total payable at hotel</dt>
+            <dd class="font-display text-4xl font-semibold text-forest-900">
+              {{ booking.summary.grandTotal | inr }}
+            </dd>
+            <p class="mt-1 text-xs text-stone-500">
+              {{ booking.summary.nights }} {{ booking.summary.nights === 1 ? 'night' : 'nights' }}, inclusive of GST
+            </p>
+          </div>
+        </dl>
+        <div class="flex flex-col gap-3 border-t border-ivory-200 bg-ivory-50 p-8 sm:flex-row">
+          <a routerLink="/" class="btn-primary">Back to Home</a>
+          <button type="button" class="btn-outline" (click)="startNewBooking()">Make Another Booking</button>
+        </div>
+      </div>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="grid gap-10 lg:grid-cols-[1fr_380px]">
+        <div class="space-y-8">
+          <!-- 1. Stay details -->
+          <fieldset class="card p-6 sm:p-8" formGroupName="stay">
+            <legend class="contents">
+              <span class="flex items-center gap-3">
+                <span class="grid size-9 place-items-center rounded-full bg-forest-800 font-display text-lg text-gold-300">1</span>
+                <span class="font-display text-3xl text-forest-900">Your stay</span>
+              </span>
+            </legend>
+            <div class="mt-6 grid gap-5 sm:grid-cols-2">
+              <div>
+                <label for="check-in" class="form-label">Check-in date</label>
+                <input
+                  id="check-in"
+                  type="date"
+                  formControlName="checkIn"
+                  [min]="today"
+                  class="form-control"
+                  (change)="onCheckInChange()"
+                />
+                @if (showError('stay.checkIn')) {
+                  <p class="form-error">Please select a check-in date.</p>
+                }
+              </div>
+              <div>
+                <label for="check-out" class="form-label">Check-out date</label>
+                <input
+                  id="check-out"
+                  type="date"
+                  formControlName="checkOut"
+                  [min]="form.controls.stay.controls.checkIn.value || today"
+                  class="form-control"
+                />
+                @if (showError('stay.checkOut')) {
+                  <p class="form-error">Please select a check-out date.</p>
+                }
+              </div>
+              <div>
+                <label for="adults" class="form-label">Adults</label>
+                <select id="adults" formControlName="adults" class="form-control">
+                  @for (n of adultOptions; track n) {
+                    <option [ngValue]="n">{{ n }} {{ n === 1 ? 'Adult' : 'Adults' }}</option>
+                  }
+                </select>
+              </div>
+              <div>
+                <label for="children" class="form-label">Children (below 12)</label>
+                <select id="children" formControlName="children" class="form-control">
+                  @for (n of childOptions; track n) {
+                    <option [ngValue]="n">{{ n }} {{ n === 1 ? 'Child' : 'Children' }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+            @if (form.controls.stay.errors && (form.controls.stay.touched || submitted())) {
+              <p class="form-error mt-4 flex items-center gap-2" role="alert">
+                <app-icon name="x" class="size-4" />
+                {{
+                  form.controls.stay.hasError('pastCheckIn')
+                    ? 'Check-in date cannot be in the past.'
+                    : 'Check-out must be at least one night after check-in.'
+                }}
+              </p>
+            }
+          </fieldset>
+
+          <!-- 2. Room selection -->
+          <fieldset class="card p-6 sm:p-8">
+            <legend class="contents">
+              <span class="flex items-center gap-3">
+                <span class="grid size-9 place-items-center rounded-full bg-forest-800 font-display text-lg text-gold-300">2</span>
+                <span class="font-display text-3xl text-forest-900">Choose your room</span>
+              </span>
+            </legend>
+            <div class="mt-6 grid gap-4">
+              @for (r of rooms; track r.id) {
+                <label
+                  class="flex cursor-pointer gap-4 rounded-sm border p-3 transition has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-gold-400 sm:items-center"
+                  [class]="
+                    form.controls.roomId.value === r.id
+                      ? 'border-gold-500 bg-gold-100/40'
+                      : 'border-ivory-200 hover:border-gold-300'
+                  "
+                >
+                  <input
+                    type="radio"
+                    formControlName="roomId"
+                    [value]="r.id"
+                    class="sr-only"
+                    [attr.data-invalid]="showError('roomId')"
+                  />
+                  <img [src]="r.images[0]" [alt]="r.name" loading="lazy" class="size-20 shrink-0 rounded-sm object-cover sm:h-20 sm:w-28" />
+                  <span class="flex flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                    <span>
+                      <span class="block font-display text-xl text-forest-900">{{ r.name }}</span>
+                      <span class="block text-xs text-stone-500">
+                        {{ r.bed }} · {{ r.sizeSqFt }} sq ft · Up to {{ r.maxAdults + r.maxChildren }} guests
+                      </span>
+                      @if (!roomFits(r.id)) {
+                        <span class="mt-1 block text-xs text-red-600">Not suitable for {{ guestCount() }} guests</span>
+                      }
+                    </span>
+                    <span class="font-display text-2xl font-semibold text-forest-900 sm:text-right">
+                      {{ r.pricePerNight | inr }}<span class="block font-sans text-xs font-normal text-stone-500">per night</span>
+                    </span>
+                  </span>
+                  <span
+                    class="mt-1 grid size-5 shrink-0 place-items-center rounded-full border-2 sm:mt-0"
+                    [class]="form.controls.roomId.value === r.id ? 'border-gold-500 bg-gold-500 text-white' : 'border-ivory-300'"
+                    aria-hidden="true"
+                  >
+                    @if (form.controls.roomId.value === r.id) {
+                      <app-icon name="check" class="size-3" [strokeWidth]="3" />
+                    }
+                  </span>
+                </label>
+              }
+            </div>
+            @if (showError('roomId')) {
+              <p class="form-error mt-4" role="alert">Please select a room.</p>
+            } @else if (form.hasError('capacityExceeded') && (form.controls.roomId.touched || submitted())) {
+              <p class="form-error mt-4" role="alert">
+                The selected room cannot accommodate {{ guestCount() }} guests. Please choose a larger room or reduce
+                guests.
+              </p>
+            }
+          </fieldset>
+
+          <!-- 3. Guest details -->
+          <fieldset class="card p-6 sm:p-8" formGroupName="guest">
+            <legend class="contents">
+              <span class="flex items-center gap-3">
+                <span class="grid size-9 place-items-center rounded-full bg-forest-800 font-display text-lg text-gold-300">3</span>
+                <span class="font-display text-3xl text-forest-900">Guest details</span>
+              </span>
+            </legend>
+            <div class="mt-6 grid gap-5 sm:grid-cols-2">
+              <div>
+                <label for="first-name" class="form-label">First name</label>
+                <input id="first-name" type="text" formControlName="firstName" autocomplete="given-name" class="form-control" />
+                @if (showError('guest.firstName')) {
+                  <p class="form-error">Please enter your first name.</p>
+                }
+              </div>
+              <div>
+                <label for="last-name" class="form-label">Last name</label>
+                <input id="last-name" type="text" formControlName="lastName" autocomplete="family-name" class="form-control" />
+                @if (showError('guest.lastName')) {
+                  <p class="form-error">Please enter your last name.</p>
+                }
+              </div>
+              <div>
+                <label for="email" class="form-label">Email address</label>
+                <input id="email" type="email" formControlName="email" autocomplete="email" class="form-control" placeholder="you@example.com" />
+                @if (showError('guest.email')) {
+                  <p class="form-error">Please enter a valid email address.</p>
+                }
+              </div>
+              <div>
+                <label for="phone" class="form-label">Mobile number</label>
+                <input id="phone" type="tel" formControlName="phone" autocomplete="tel" class="form-control" placeholder="+91 98765 43210" />
+                @if (showError('guest.phone')) {
+                  <p class="form-error">Please enter a valid 10-digit Indian mobile number.</p>
+                }
+              </div>
+              <div class="sm:col-span-2">
+                <label for="requests" class="form-label">Special requests <span class="normal-case">(optional)</span></label>
+                <textarea
+                  id="requests"
+                  rows="3"
+                  formControlName="specialRequests"
+                  class="form-control resize-none"
+                  placeholder="Early check-in, dietary preferences, celebration arrangements…"
+                ></textarea>
+                @if (showError('guest.specialRequests')) {
+                  <p class="form-error">Please keep requests under 500 characters.</p>
+                }
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- 4. Add-ons -->
+          <fieldset class="card p-6 sm:p-8" formGroupName="addOns">
+            <legend class="contents">
+              <span class="flex items-center gap-3">
+                <span class="grid size-9 place-items-center rounded-full bg-forest-800 font-display text-lg text-gold-300">4</span>
+                <span class="font-display text-3xl text-forest-900">Enhance your stay</span>
+              </span>
+            </legend>
+            <div class="mt-6 grid gap-4 sm:grid-cols-2">
+              @if (breakfastIncluded()) {
+                <div class="flex gap-4 rounded-sm border border-forest-200 bg-forest-50 p-4">
+                  <app-icon name="check-circle" class="mt-0.5 size-4 text-forest-600" />
+                  <span>
+                    <span class="flex items-center gap-2 font-medium text-forest-900">
+                      <app-icon name="utensils" class="size-4 text-gold-600" /> Breakfast buffet
+                    </span>
+                    <span class="mt-1 block text-xs text-stone-500">Complimentary with this room</span>
+                  </span>
+                </div>
+              } @else {
+                <label class="flex cursor-pointer gap-4 rounded-sm border border-ivory-200 p-4 transition hover:border-gold-300 has-[:checked]:border-gold-500 has-[:checked]:bg-gold-100/40">
+                  <input type="checkbox" formControlName="breakfast" class="mt-1 size-4 accent-forest-800" />
+                  <span>
+                    <span class="flex items-center gap-2 font-medium text-forest-900">
+                      <app-icon name="utensils" class="size-4 text-gold-600" /> Breakfast buffet
+                    </span>
+                    <span class="mt-1 block text-xs text-stone-500">{{ addOnPrices.breakfast | inr }} per guest, per night</span>
+                  </span>
+                </label>
+              }
+              <label class="flex cursor-pointer gap-4 rounded-sm border border-ivory-200 p-4 transition hover:border-gold-300 has-[:checked]:border-gold-500 has-[:checked]:bg-gold-100/40">
+                <input type="checkbox" formControlName="airportTransfer" class="mt-1 size-4 accent-forest-800" />
+                <span>
+                  <span class="flex items-center gap-2 font-medium text-forest-900">
+                    <app-icon name="car" class="size-4 text-gold-600" /> Airport transfer
+                  </span>
+                  <span class="mt-1 block text-xs text-stone-500">{{ addOnPrices.airportTransfer | inr }} round trip, private sedan</span>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+        </div>
+
+        <!-- Summary -->
+        <aside>
+          <div class="card overflow-hidden lg:sticky lg:top-28">
+            @if (selectedRoom(); as room) {
+              <img [src]="room.images[0]" [alt]="room.name" class="aspect-[16/9] w-full object-cover" />
+            }
+            <div class="p-6">
+              <h2 class="text-3xl font-semibold">Price summary</h2>
+              <div class="gold-rule mt-3"></div>
+
+              <dl class="mt-5 space-y-3 text-sm">
+                <div class="flex justify-between gap-4">
+                  <dt class="text-stone-500">Room</dt>
+                  <dd class="text-right font-medium text-forest-900">{{ selectedRoom()?.name ?? 'Not selected' }}</dd>
+                </div>
+                <div class="flex justify-between gap-4">
+                  <dt class="text-stone-500">Dates</dt>
+                  <dd class="text-right text-forest-900">
+                    @if (summary().nights > 0) {
+                      {{ form.controls.stay.controls.checkIn.value | date: 'd MMM' }} –
+                      {{ form.controls.stay.controls.checkOut.value | date: 'd MMM y' }}
+                    } @else {
+                      —
+                    }
+                  </dd>
+                </div>
+                <div class="flex justify-between gap-4">
+                  <dt class="text-stone-500">Guests</dt>
+                  <dd class="text-forest-900">{{ guestCount() }}</dd>
+                </div>
+              </dl>
+
+              @if (summary().nights > 0 && selectedRoom(); as room) {
+                <dl class="mt-5 space-y-3 border-t border-ivory-200 pt-5 text-sm">
+                  <div class="flex justify-between">
+                    <dt class="text-stone-600">
+                      {{ room.pricePerNight | inr }} × {{ summary().nights }}
+                      {{ summary().nights === 1 ? 'night' : 'nights' }}
+                    </dt>
+                    <dd>{{ summary().roomTotal | inr }}</dd>
+                  </div>
+                  @if (summary().addOnsTotal > 0) {
+                    <div class="flex justify-between">
+                      <dt class="text-stone-600">Add-ons</dt>
+                      <dd>{{ summary().addOnsTotal | inr }}</dd>
+                    </div>
+                  }
+                  <div class="flex justify-between">
+                    <dt class="text-stone-600">GST ({{ summary().taxRate * 100 }}%)</dt>
+                    <dd>{{ summary().taxes | inr }}</dd>
+                  </div>
+                  <div class="flex items-baseline justify-between border-t border-ivory-200 pt-4">
+                    <dt class="font-medium text-forest-900">Total</dt>
+                    <dd class="font-display text-3xl font-semibold text-forest-900">{{ summary().grandTotal | inr }}</dd>
+                  </div>
+                </dl>
+              } @else {
+                <p class="mt-5 rounded-sm bg-ivory-100 p-4 text-sm text-stone-500">
+                  Select your dates and a room to see the total price.
+                </p>
+              }
+
+              <label class="mt-6 flex cursor-pointer gap-3 text-xs leading-relaxed text-stone-600">
+                <input type="checkbox" formControlName="acceptTerms" class="mt-0.5 size-4 shrink-0 accent-forest-800" />
+                <span>I agree to the hotel's booking terms and cancellation policy (free cancellation up to 48 hours before check-in).</span>
+              </label>
+              @if (showError('acceptTerms')) {
+                <p class="form-error">Please accept the booking terms to continue.</p>
+              }
+
+              <button type="submit" class="btn-gold mt-6 w-full" [disabled]="submitting()">
+                @if (submitting()) {
+                  <span class="size-4 animate-spin rounded-full border-2 border-white/40 border-t-white"></span>
+                  Confirming…
+                } @else {
+                  Confirm Booking
+                }
+              </button>
+              @if (submitted() && form.invalid) {
+                <p class="form-error mt-3 text-center" role="alert">Please review the highlighted fields above.</p>
+              }
+              <p class="mt-4 flex items-center justify-center gap-2 text-xs text-stone-500">
+                <app-icon name="shield" class="size-4 text-forest-600" /> No payment required now · Pay at hotel
+              </p>
+            </div>
+          </div>
+        </aside>
+      </form>
+    }
+  </div>
+</section>
